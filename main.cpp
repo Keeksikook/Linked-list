@@ -39,6 +39,7 @@ int main() {
 	cout << ((isSorted(myList)) ? "\nThis list is sorted\n" : "\nThis list is not sorted\n");
 	cout << "Sorted list = ";
 	printList(sort(myList));
+	std::cout << "\n";
 	system("PAUSE");
 }
 
@@ -110,7 +111,7 @@ bool isSorted(Node *top) {
 		return 0;
 	for (Node *t = top; t->next != NULL; t = t->next)
 	{
-		if (t->data <= t->next->data)
+		if (t->data > t->next->data)
 			return false; //if at least one is not sorted, return false...
 	}
 	return true; // ...otherwise true
@@ -164,7 +165,7 @@ Node* reverse(Node* head)
 
 Node* sort(Node * top)
 {
-	while (!isSorted(top)) //This while loop never terminates for some reason, although i'm pretty sure isSorted works.
+	while (!isSorted(top))
 	{
 		for (Node* ptr = top; ptr != NULL; ptr = ptr->next)
 			if (ptr->next != NULL)
