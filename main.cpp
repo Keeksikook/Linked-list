@@ -164,7 +164,7 @@ Node* reverse(Node* head)
 
 Node* sort(Node * top)
 {
-	while (!isSorted(top))
+	while (!isSorted(top)) //This while loop never terminates for some reason, although i'm pretty sure isSorted works.
 	{
 		for (Node* ptr = top; ptr != NULL; ptr = ptr->next)
 			if (ptr->next != NULL)
