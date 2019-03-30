@@ -39,7 +39,9 @@ int main() {
 	cout << ((isSorted(myList)) ? "\nThis list is sorted\n" : "\nThis list is not sorted\n");
 	cout << "Sorted list = ";
 	printList(sort(myList));
-	std::cout << "\n";
+	cout << "\nYour reversed list = ";
+	printList(reverse(myList));
+	cout << "\n";
 	system("PAUSE");
 }
 
@@ -128,21 +130,6 @@ Node* insertInOrder(Node * top, int num) // keep the var names the same
 	return top;
 }
 
-//Node* reverse(Node *top) {
-//	Node *curr = top;
-//	Node *advCurr = NULL;
-//	while (curr != NULL) {
-//		advCurr = curr->next;
-//		if (top == curr)
-//			top->next = NULL;
-//		else {
-//			curr->next = top;
-//			top = curr;
-//		}
-//		curr = advCurr;
-//	} //while      
-//	return top;
-//}
 Node* reverse(Node* head)
 {
 	// Initialize current, previous and 
@@ -159,7 +146,7 @@ Node* reverse(Node* head)
 		current = next;
 	}
 	head = prev;
-	head->next = current;
+	/*head->next = current;*/
 	return head;
 }
 
