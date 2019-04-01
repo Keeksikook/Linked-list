@@ -19,11 +19,13 @@ bool isSorted(Node *top);
 Node* insertInOrder(Node * top, int key);
 Node* reverse(Node* top);
 Node* sort(Node* top);
+Node& itemAt(Node* top, unsigned n);
+bool inRange(int n, int min, int max);
+void reverseConnection(Node* a, Node* b);
+Node* insertAt(Node* top, unsigned index, int data); //This could be void, but programmers return items they create so they can do "Node* ptr = insertAt(.., .., ..)" and they would get 1 node, and 1 ptr to it
 
 
 int main() {
-
-
 
 	int num;
 
@@ -31,7 +33,7 @@ int main() {
 	Node *myList = nullptr;
 	cout << "Enter numbers for a linked list.\nEnter -1 to terminate\n";
 	while (cin >> num && num != -1)
-		myList = insertAtHead(myList, num);
+		myList = insertInOrder(myList, num);
 	cout << "List = ";
 	printList(myList);
 	cout << ", n = ";
@@ -39,8 +41,22 @@ int main() {
 	cout << ((isSorted(myList)) ? "\nThis list is sorted\n" : "\nThis list is not sorted\n");
 	cout << "Sorted list = ";
 	printList(sort(myList));
-	cout << "\nYour reversed list = ";
-	printList(reverse(myList));
+	cout << ", n = ";
+	cout << size(myList) << ", sum = " << sumList(myList);
+	//cout << "\nYour reversed list = "; /*reverse() IS BROKEN*/
+	//printList(reverse(myList));
+	//cout << ", n = ";
+	//cout << size(myList) << ", sum = " << sumList(myList);
+	cout << "\nPlease enter an index to any member of the reversed list: \n";
+	cin >> num;
+	if (inRange(num, 0, size(myList) - 1))
+		cout << "You have accessed <" << itemAt(myList, num).data << ">.\n";
+	else
+		cout << "Error: <index-out-bounds>\n";
+	cout << "<<Emplacing item <" << num << "> at index <" << num << ">>\n";
+	cout << "New array: ";
+	insertAt(myList, num, num);
+	printList(myList);
 	cout << "\n";
 	system("PAUSE");
 }
@@ -53,6 +69,23 @@ Node * createNode(int n) {
 	newNode->data = n;
 	newNode->next = NULL;
 	return newNode;
+}
+
+void printList(Node* top)
+{
+	if (top == NULL)
+	{
+		cout << "[<empty-list>]";
+		return;
+	}
+	Node *temp = top;
+	cout << "[ ";
+	while (temp != NULL)
+	{
+		cout << temp->data << " ";
+		temp = temp->next;
+	}
+	cout << "]";
 }
 
 Node * insertAtHead(Node * top, int n) {
@@ -76,22 +109,6 @@ int size(Node * top) {
 	return numNodes;
 }
 
-void printList(Node* top)
-{
-	if (top == NULL)
-	{
-		cout << "[<empty-list>]";
-		return;
-	}
-	Node *temp = top;
-	cout << "[ ";
-	while (temp != NULL)
-	{
-		cout << temp->data << " ";
-		temp = temp->next;
-	}
-	cout << "]";
-}
 
 int sumList(Node * top) {
 	Node * curr = top; // again, on one line...
@@ -124,40 +141,97 @@ bool isSorted(Node *top) {
 
 Node* insertInOrder(Node * top, int num) // keep the var names the same
 {
+	Node* ptr = top;
 	Node* newNode = createNode(num);
-	delete newNode;
-	top = reverse(top);
-	return top;
+	if (ptr)
+	{
+		for (int i = 0; i < size(top) - 1; i++)
+			ptr = ptr->next;
+		ptr->next = newNode;
+
+		return top;
+	}
+	else
+		return insertAtHead(top, num);
 }
 
 Node* reverse(Node* head)
 {
-	// Initialize current, previous and 
-	// next pointers 
-	Node *current = head;
-	Node *prev = NULL, *next = NULL;
-
-
-	while (current != NULL)
+	if (!head || !head->next)
+		return head;
+	Node* current = head->next, *storePtr = nullptr, *previous = head;
+	previous->next = nullptr;
+	while (current)
 	{
-		next = current->next;
-		current->next = prev; //Switch pointer around
-		prev = current;
-		current = next;
+		storePtr = current->next;
+		current->next = previous;
+		previous = current;
+		current = storePtr;
 	}
-	head = prev;
-	/*head->next = current;*/
-	return head;
+	return previous;
 }
 
 Node* sort(Node * top)
 {
 	while (!isSorted(top))
-	{
+	{		
 		for (Node* ptr = top; ptr != NULL; ptr = ptr->next)
 			if (ptr->next != NULL)
 				if (ptr->data > ptr->next->data)
 					swap(ptr->data, ptr->next->data);
 	}
+	return top;
+}
+
+Node& itemAt(Node* top, unsigned n)
+{
+	Node* ptr = top;
+	for (int i = 0; i < n; i++)
+		ptr = ptr->next;    //Move the pointer to the right location
+	return *ptr;			// Return dereferenced pointer as reference, to allow modification
+}
+
+bool inRange(int n, int min, int max)
+{
+	return (n >= min && n <= max); //Inclusive
+}
+
+void reverseConnection(Node * a, Node * b)
+{
+	Node* aa = a;
+	a->next = b->next;
+	b->next = aa;
+}
+
+Node* insertAt(Node * top, unsigned index, int data)
+{
+	if (index == 0)
+	{
+		Node* newNode = createNode(data); //Why does this function only work when used with '=': myList = insertAt(<gtrthanmax>);
+		newNode->next = top;
+		return top;
+	}
+
+	Node* ptr = top;
+	Node* prev = top;
+	Node* newNode = createNode(data);
+	if (!inRange(index, 0, size(top) - 1))
+	{
+		for (int i = 0; i < size(top) - 1; i++)
+		{
+			ptr = ptr->next; // Move the ptr to the right place
+		}
+		newNode->next = nullptr;
+		ptr->next = newNode;
+		return top;
+	}
+	for (int i = 0; i < index; i++)
+	{
+		if (i == index - 1)
+			prev = ptr; // Take the previous node, so we can set its .next correct
+		ptr = ptr->next; // Move the ptr to the right place
+	}
+	newNode->next = ptr;
+	prev->next = newNode;
 	return top;
 }
